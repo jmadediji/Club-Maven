@@ -1,4 +1,5 @@
-package Creation; // i have no clue what creation does but it yells at me if its not here. If you understand please explain
+package Creation;
+
 import java.time.LocalDate;
 import java.time.Period;
 
@@ -13,6 +14,8 @@ public class Member {
     private String phone;
     private String email;
     private int age;
+    private int visitCounter;
+    private int visitCountdown;
     private String preferredContactMethod;
     private LocalDate creationDate;
     private boolean isActiveMember;
@@ -21,11 +24,11 @@ public class Member {
     private int membershipId;
 
     public Member(String firstName, String lastName, String username, LocalDate dateOfBirth,
-                  String address, String phone, String email, String preferredContactMethod,
-                  LocalDate creationDate, boolean isActiveMember, String membershipPlan) {
+            String address, String phone, String email, String preferredContactMethod,
+            LocalDate creationDate, boolean isActiveMember, String membershipPlan) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.username = username;
+        this.username = firstName + lastName;
         this.dateOfBirth = dateOfBirth;
         this.address = address;
         this.phone = phone;
@@ -35,11 +38,66 @@ public class Member {
         this.isActiveMember = isActiveMember;
         this.membershipPlan = membershipPlan;
         this.age = calculateAge(dateOfBirth);
-        this.membershipEndDate = calculateMembershipEndDate(creationDate, membershipPlan);
+        // this.membershipEndDate = calculateMembershipEndDate(creationDate,
+        // membershipPlan);
         this.membershipId = nextMembershipId++;
+        this.visitCountdown = 30; // Initialize visit countdown (adjust the initial value as needed)
+        this.visitCounter = 0;
+
     }
 
     // Getter methods for attributes
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public int getVisitCounter() {
+        return visitCounter;
+    }
+
+    public int getVisitCountdown() {
+        return visitCountdown;
+    }
+
+    public String getPreferredContactMethod() {
+        return preferredContactMethod;
+    }
+
+    public LocalDate getCreationDate() {
+        return creationDate;
+    }
+
+    public boolean isActiveMember() {
+        return isActiveMember;
+    }
+
+    public String getMembershipPlan() {
+        return membershipPlan;
+    }
 
     public int getAge() {
         return age;
@@ -67,12 +125,7 @@ public class Member {
         return Period.between(dateOfBirth, currentDate).getYears();
     }
 
-    private LocalDate calculateMembershipEndDate(LocalDate startDate, String plan) {
-        // Logic to calculate the membership end date based on the start date and plan
-        // TODO: his is a placeholder //need to implement more logic
-        return startDate.plusMonths(12); //one-year membership
-    }
-    void delete() { 
+    void delete() {
         // TODO: Implement this feature
         // marking them as inactive or removing them from a database?
         // set isActiveMember to false or perform any necessary cleanup
@@ -80,7 +133,7 @@ public class Member {
     }
 
     LocalDate start() {
-        // TODO: Implement this feature 
+        // TODO: Implement this feature
         // This method could be used to get the start date of the membership.
         return creationDate;
     }
@@ -88,28 +141,47 @@ public class Member {
     boolean active() {
         // TODO: Implement this feature
         // This method checks if the membership is currently active.
+        LocalDate currentDate = LocalDate.now();
+        if (visitCountdown() && membershipEndDate != currentDate) {
+            isActiveMember = false;
+        }
         return isActiveMember;
     }
 
     boolean visitCountdown() {
         // TODO: Implement this feature
-        // This method could be used to check if the member's visit countdown has reached <= 0.
-        // You would need to add a variable representing the visit countdown and decrement it accordingly.
+        // This method could be used to check if the member's visit countdown has
+        // reached <= 0.
+        // You would need to add a variable representing the visit countdown and
+        // decrement it accordingly.
         // For example:
         // return visitCountdown <= 0;
         // where visitCountdown is a member variable that you would decrement over time.
         // Make sure to initialize it appropriately when a member is created.
-        return false; // TODO: Placeholder, replace with actual implementation
+        int visitCounter = this.visitCounter;
+        if (visitCounter > 0) {
+            visitCountdown--;
+        }
+        return visitCountdown <= 0; // TODO: Placeholder, replace with actual implementation
     }
 
     int visitStreak() {
         // TODO: Implement this feature
         // This method could be used to get the all-time visit streak of the member.
-        // You would need to add a variable representing the visit streak and update it based on the member's activity.
+        // You would need to add a variable representing the visit streak and update it
+        // based on the member's activity.
         // For example:
         // return visitStreak;
-        // where visitStreak is a member variable that you would update based on the member's visits.
-        return 0; // Placeholder, replace with actual implementation
+        // where visitStreak is a member variable that you would update based on the
+        // member's visits.
+
+        return visitCounter; // Placeholder, replace with actual implementation
+    }
+
+    void recordVisit() { // should be used in checkin
+        visitCounter++;
+
+        visitCountdown = 30;
     }
 
     @Override
